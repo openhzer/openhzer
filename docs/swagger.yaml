@@ -1,0 +1,104 @@
+definitions:
+  admin.login:
+    properties:
+      captcha:
+        $ref: '#/definitions/captcha.Model'
+      pass_word:
+        type: string
+      user_name:
+        type: string
+    required:
+    - captcha
+    - pass_word
+    - user_name
+    type: object
+  captcha.Model:
+    properties:
+      id:
+        type: string
+      value:
+        type: string
+    required:
+    - id
+    - value
+    type: object
+  captcha.reqCaptcha:
+    properties:
+      data:
+        type: string
+      id:
+        type: string
+    type: object
+  response.Message:
+    properties:
+      data: {}
+      error:
+        type: integer
+      msg:
+        type: string
+    type: object
+  response.Token:
+    properties:
+      token:
+        type: string
+    type: object
+host: 127.0.0.1:18080
+info:
+  contact:
+    name: API Support
+    url: http://www.swagger.io/support
+  description: Hzer后端API接口文档
+  license:
+    name: MIT
+    url: https://gitee.com/LoveA/Hzer/blob/master/LICENSE
+  title: Hzer后端服务
+  version: "1.0"
+paths:
+  /admin/api/login:
+    post:
+      consumes:
+      - application/json
+      description: 用于管理员登录鉴权
+      parameters:
+      - description: 登录提交参数
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/admin.login'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Message'
+            - properties:
+                Data:
+                  $ref: '#/definitions/response.Token'
+              type: object
+      summary: 管理员登录api
+      tags:
+      - admin
+  /api/captcha:
+    get:
+      consumes:
+      - application/json
+      description: 用于预防人机的验证码
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Message'
+            - properties:
+                Data:
+                  $ref: '#/definitions/captcha.reqCaptcha'
+              type: object
+      summary: 获取验证码
+      tags:
+      - public
+swagger: "2.0"

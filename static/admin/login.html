@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
+<meta name="keywords" content="LightYear,LightYearAdmin,光年,后台模板,后台管理系统,光年HTML模板">
+<meta name="description" content="Light Year Admin V4是一个基于Bootstrap v4.4.1的后台管理系统的HTML模板。">
+<meta name="author" content="yinq">
+<title>登录页面二 - 光年(Light Year Admin V4)后台管理系统模板</title>
+<link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-touch-fullscreen" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="stylesheet" type="text/css" href="css/materialdesignicons.min.css">
+<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+<link rel="stylesheet" type="text/css" href="css/animate.min.css">
+<link rel="stylesheet" type="text/css" href="css/style.min.css">
+<style>
+.login-form .has-feedback {
+    position: relative;
+}
+.login-form .has-feedback .form-control {
+    padding-left: 36px;
+}
+.login-form .has-feedback .mdi {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: auto;
+    width: 36px;
+    height: 36px;
+    line-height: 36px;
+    z-index: 4;
+    color: #dcdcdc;
+    display: block;
+    text-align: center;
+    pointer-events: none;
+}
+.login-form .has-feedback.row .mdi {
+    left: 15px;
+}
+</style>
+</head>
+  
+<body class="center-vh" style="background-image: url(img/bg.jpeg); background-size: cover;">
+<!--页面loading-->
+<div id="lyear-preloader" class="loading">
+  <div class="ctn-preloader">
+    <div class="round_spinner">
+      <div class="spinner"></div>
+      <img src="img/loading-logo.png" alt="">
+    </div>
+  </div>
+</div>
+<!--页面loading end-->
+<div class="card card-shadowed p-5 w-420 mb-0 mr-2 ml-2">
+  <div class="text-center mb-3">
+    <a href="index.html"> <img alt="light year admin" src="img/logo-sidebar.png"> </a>
+  </div>
+
+  <form action="#!" method="post" class="login-form">
+    <div class="form-group has-feedback">
+      <span class="mdi mdi-account" aria-hidden="true"></span>
+      <input type="text" class="form-control" id="username" placeholder="用户名" required>
+    </div>
+
+    <div class="form-group has-feedback">
+      <span class="mdi mdi-lock" aria-hidden="true"></span>
+      <input type="password" class="form-control" id="password" placeholder="密码" required>
+    </div>
+    
+    <div class="form-group has-feedback row">
+      <div class="col-7">
+        <span class="mdi mdi-check-all form-control-feedback" aria-hidden="true"></span>
+        <input type="text" id="captcha" class="form-control" placeholder="验证码" required>
+      </div>
+      <div class="col-5 text-right">
+        <img src="" class="pull-right" id="captchal" style="cursor: pointer;" title="点击刷新" alt="captcha">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <div class="custom-control custom-checkbox">
+        <input type="checkbox" class="custom-control-input" id="rememberme">
+        <label class="custom-control-label not-user-select" for="rememberme">5天内自动登录</label>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <div class="btn btn-block btn-primary" id="loginb">立即登录</div>
+    </div>
+  </form>
+  
+  <p class="text-center text-muted mb-0">Copyright © 2022 <a href="http://lyear.itshubao.com">IT书包</a>. All right reserved</p>
+</div>
+  
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script type="text/javascript" src="js/main.min.js"></script>
+<script type="text/javascript" src="js/appjs/app.js"></script>
+<script type="text/javascript" src="js/appjs/login.js"></script>
+</body>
+</html>

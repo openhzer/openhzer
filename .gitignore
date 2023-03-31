@@ -1,0 +1,8 @@
+/.idea
+go.sum
+configs/*_config.yml
+bin/*
+test/*
+/go.mod
+*_config.yml
+apiclient_key.pem
