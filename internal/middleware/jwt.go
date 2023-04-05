@@ -6,9 +6,43 @@ import (
 	jwtpkg "hzer/pkg/jwt"
 )
 
-//JWTAuth 为JWT中间件，客户端下需要在header带上Authorization: Bearer <token>
-//issure 为可选验证签名，支持多参选择
-func JWTAuth(issure ...string) gin.HandlerFunc {
+// JWTCheck 检查是否登陆
+// 检查完毕会将jwt结构体写入到Context
+// 适用于同时用于公开与鉴权的路由
+func JWTCheck(c *gin.Context, model jwtpkg.LoadModel, issure ...string) (bool, error) {
+	token := c.Request.Header.Get("Authorization")
+	if token == "" {
+		return false, nil
+	}
+	if len(token) < 8 {
+		return false, nil
+	}
+	token = token[7:]
+	chk, jwter, Claims, err := jwtpkg.CheckToken(token, model, "")
+	if err != nil {
+		return false, err
+	}
+	chs := true
+	for _, v := range issure {
+		if v != Claims.Issuer {
+			chs = false
+			break
+		}
+	}
+	if !chs {
+		return false, nil
+	}
+	if !chk {
+		return false, nil
+	}
+	c.Set("token", jwter)
+	c.Next()
+	return true, nil
+}
+
+// JWTAuth 为JWT中间件，客户端下需要在header带上Authorization: Bearer <token>
+// issure 为可选验证签名，支持多参选择
+func JWTAuth(model jwtpkg.LoadModel, issure ...string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token := c.Request.Header.Get("Authorization")
 		if token == "" {
@@ -22,7 +56,7 @@ func JWTAuth(issure ...string) gin.HandlerFunc {
 			return
 		}
 		token = token[7:]
-		chk, jwt, err := jwtpkg.CheckToken(token, "")
+		chk, jwter, Claims, err := jwtpkg.CheckToken(token, model, "")
 		if err != nil {
 			errmsg := response.TokenWrongful
 			errmsg.Msg = "令牌验证错误"
@@ -30,9 +64,14 @@ func JWTAuth(issure ...string) gin.HandlerFunc {
 			c.Abort()
 			return
 		}
+		if !chk {
+			response.FailJson(c, response.NoAccess, true, "破损令牌")
+			c.Abort()
+			return
+		}
 		chs := true
 		for _, v := range issure {
-			if v != jwt.Issuer {
+			if v != Claims.Issuer {
 				chs = false
 				break
 			}
@@ -44,12 +83,9 @@ func JWTAuth(issure ...string) gin.HandlerFunc {
 			c.Abort()
 			return
 		}
-		if !chk {
-			response.FailJson(c, response.NoAccess, true, "破损令牌")
-			c.Abort()
-			return
-		}
-		c.Set("token", jwt)
+		c.Set("token", jwter)
+		c.Set("tokenStr", token)
+		c.Set("token.issuer", Claims.Issuer)
 		c.Next()
 	}
 }

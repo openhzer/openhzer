@@ -7,8 +7,8 @@ import (
 	"unsafe"
 )
 
-//Ifs 三目运算的函数
-func Ifs(a bool, b, c interface{}) interface{} {
+// Ifs 三目运算的函数
+func Ifs[T any](a bool, b, c T) T {
 	if a {
 		return b
 	}
