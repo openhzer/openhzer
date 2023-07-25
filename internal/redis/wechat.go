@@ -9,13 +9,13 @@ import (
 	"time"
 )
 
-//CreateWechatTempUID 用于创建不重复的微信临时uuid
+// CreateWechatTempUID 用于创建不重复的微信临时uuid
 func CreateWechatTempUID() (uuid string, err error) {
 	redisconn := pool.Get()
 	defer redisconn.Close()
 	var ex bool
 	for {
-		uuid = util.GetUUID()
+		uuid, _ = util.GetUUID()
 		keys := fmt.Sprintf("Hzer:JWT:Wechat:Temp:%s", uuid)
 		ex, err = redis.Bool(redisconn.Do(
 			"SETNX", keys, time.Now().Unix(),
@@ -33,7 +33,7 @@ func CreateWechatTempUID() (uuid string, err error) {
 	return
 }
 
-//SaveWechatTempInfo 缓存临时微信信息
+// SaveWechatTempInfo 缓存临时微信信息
 func SaveWechatTempInfo(uuid string, auth auth.ResCode2Session) error {
 	redisconn := pool.Get()
 	defer redisconn.Close()

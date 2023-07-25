@@ -1,7 +1,7 @@
 package util
 
 import (
-	"github.com/satori/go.uuid"
+	"github.com/gofrs/uuid"
 	"math/rand"
 	"time"
 	"unsafe"
@@ -15,8 +15,9 @@ func Ifs[T any](a bool, b, c T) T {
 	return c
 }
 
-func GetUUID() string {
-	return uuid.NewV4().String()
+func GetUUID() (string, error) {
+	u2, err := uuid.NewV4()
+	return u2.String(), err
 }
 
 const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"

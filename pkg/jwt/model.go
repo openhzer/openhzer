@@ -1,9 +1,9 @@
 package jwt
 
-import "github.com/dgrijalva/jwt-go"
+import "github.com/golang-jwt/jwt/v5"
 
 type JWTLoad struct {
 	UserLoad interface{} `json:"user_load"`
 	Version  int64
-	jwt.StandardClaims
+	jwt.RegisteredClaims
 }

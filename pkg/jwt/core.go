@@ -3,27 +3,32 @@ package jwt
 import (
 	"errors"
 	"fmt"
-	"github.com/dgrijalva/jwt-go"
+	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v5"
 	"hzer/pkg/util"
 	"os"
 	"reflect"
 	"time"
-
-	"github.com/gin-gonic/gin"
 )
 
 const ExpiresAtFiveDays = 3600 * 24 * 5
 
-// var SecretKey = "6oFChDc2tQhXlM8XSTqAnqJik4kkpU2v"
 var SecretKey = initKey()
 
 func initKey() string {
-	sk := os.Getenv("SecretKey")
-	return util.Ifs(sk == "", "6oFChDc2tQhXlM8XSTqAnqJik4kkpU2v", sk)
+	sk := os.Getenv("HZER_JWT_SECRET_KEY")
+	//每次启动都是随机秘钥
+	return util.Ifs(sk == "", util.RandomStr(32), sk)
 }
 
+// LoadModel 成员中套上jwt.RegisteredClaims
 type LoadModel interface {
-	Valid() error
+	GetExpirationTime() (*jwt.NumericDate, error)
+	GetIssuedAt() (*jwt.NumericDate, error)
+	GetNotBefore() (*jwt.NumericDate, error)
+	GetIssuer() (string, error)
+	GetSubject() (string, error)
+	GetAudience() (jwt.ClaimStrings, error)
 }
 
 // JWT jwt对象
@@ -47,42 +52,25 @@ func (j *JWT) CreateToken(payload jwt.Claims) (string, error) {
 
 // ParserToken 将token解码并验证
 func (j *JWT) ParserToken(tokenString string, model LoadModel) (jwt.Claims, error) {
-	// https://gowalker.org/github.com/dgrijalva/jwt-go#ParseWithClaims
-	// 输入用户自定义的Claims结构体对象,token,以及自定义函数来解析token字符串为jwt的Token结构体指针
-	// Keyfunc是匿名函数类型: type Keyfunc func(*Token) (interface{}, error)
-	// func ParseWithClaims(tokenString string, claims Claims, keyFunc Keyfunc) (*Token, error) {}
-
 	token, err := jwt.ParseWithClaims(tokenString, model, func(token *jwt.Token) (interface{}, error) {
 		return j.SigningKey, nil
 	})
-
 	if err != nil {
-		// https://gowalker.org/github.com/dgrijalva/jwt-go#ValidationError
-		// jwt.ValidationError 是一个无效token的错误结构
-		if ve, ok := err.(*jwt.ValidationError); ok {
-			// ValidationErrorMalformed是一个uint常量，表示token不可用
-			if ve.Errors&jwt.ValidationErrorMalformed != 0 {
-				return nil, fmt.Errorf("token不可用")
-				// ValidationErrorExpired表示Token过期
-			} else if ve.Errors&jwt.ValidationErrorExpired != 0 {
-				return nil, fmt.Errorf("token过期")
-				// ValidationErrorNotValidYet表示无效token
-			} else if ve.Errors&jwt.ValidationErrorNotValidYet != 0 {
-				return nil, fmt.Errorf("无效的token")
-			} else {
-				return nil, fmt.Errorf("token不可用")
-			}
-
-		}
+		return nil, err
 	}
+	_, err = parserToken(token, model)
 	if token.Valid {
 		return token.Claims, nil
 	}
-	/*// 将token中的claims信息解析出来并断言成用户自定义的有效载荷结构
-	if claims, ok := token.Claims.(*JWTLoad); ok && token.Valid {
-		return claims, nil
-	}*/
 	return nil, fmt.Errorf("token无效")
+}
+
+func parserToken[T LoadModel](token *jwt.Token, model T) (jwt.Claims, error) {
+	if claims, ok := token.Claims.(T); !ok {
+		return nil, fmt.Errorf("token结构错误")
+	} else {
+		return claims, nil
+	}
 }
 
 // CreateToken 用于快速生成一个Token
@@ -101,38 +89,35 @@ func CreateToken(JWTLoad jwt.Claims) (Token string, err error) {
 }
 
 // CreateStandardClaims 快速创建签名数据
-func CreateStandardClaims(ExpiresAt int64, Issuer string) jwt.StandardClaims {
-	return jwt.StandardClaims{
-		NotBefore: time.Now().Unix() - 1000,      // 签名生效时间
-		ExpiresAt: time.Now().Unix() + ExpiresAt, // 签名过期时间
-		Issuer:    Issuer,                        // 签名颁发者
+func CreateStandardClaims(ExpiresAt int64, Issuer string) jwt.RegisteredClaims {
+	return jwt.RegisteredClaims{
+		Issuer:    Issuer,                                                                     // 签名颁发者
+		ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Second * time.Duration(ExpiresAt))), // 签名过期时间
+		IssuedAt:  jwt.NewNumericDate(time.Now()),                                             //
+		NotBefore: jwt.NewNumericDate(time.Now()),                                             // 签名生效时间
 	}
 }
 
 // CheckToken 用于检查Token是否有效
 // issuer为可选参数
-func CheckToken(token string, model LoadModel, issuer string) (bool, interface{}, *jwt.StandardClaims, error) {
+func CheckToken[T LoadModel](token string, model T, issuer string) (bool, T, error) {
 	j := NewJWT()
 	load, err := j.ParserToken(token, model)
 	if err != nil {
-		return false, nil, nil, err
+		return false, model, err
 	}
-	retv := reflect.ValueOf(model)
-	claimser := retv.Elem().FieldByName("StandardClaims")
-	if !claimser.CanSet() {
-		return false, nil, nil, errors.New("JWTLoad Can Not Set")
+	expTime, err := load.GetExpirationTime()
+	if expTime.Unix() < time.Now().Unix() {
+		return false, model, errors.New("token已过期，请重新登录")
 	}
-	claims := claimser.Interface().(jwt.StandardClaims)
-	if claims.ExpiresAt < time.Now().Unix() {
-		return false, load, &claims, errors.New("token已过期，请重新登录")
+	loadIssuer, err := load.GetIssuer()
+	if err != nil {
+		return false, model, err
 	}
-	if issuer == "" {
-		return true, load, &claims, nil
+	if issuer == loadIssuer {
+		return true, load.(T), nil
 	}
-	if issuer == claims.Issuer {
-		return true, load, &claims, nil
-	}
-	return false, load, &claims, errors.New("token签名错误，请重新登录")
+	return false, model, errors.New("token签名错误，请重新登录")
 }
 
 // GetJwtProto 从Gin中获取Jwt原型体
@@ -148,27 +133,6 @@ func GetJwtProto[T any](c *gin.Context, model T) (T, error) {
 	}
 	return token, nil
 }
-
-// GetMember 用于从GinContext中的JWTUserStruct中取回数据，返回interface{}，数据可能为nil，需要自己断言转换
-/**
- * $param {gin.context}
- */
-/*func GetMember(c *gin.Context, Member string) (*JWTLoad, interface{}) {
-	token, _ := c.Get("token")
-	if token == nil {
-		return nil, nil
-	}
-	load := token.(*JWTLoad)
-	if load.UserLoad == nil {
-		return nil, nil
-	}
-	ujwt := load.UserLoad.(map[string]interface{})
-	v, ok := ujwt[Member]
-	if !ok {
-		return nil, nil
-	}
-	return load, v
-}*/
 
 // GetTokenLoad 用于从GinContext中取回JWTUsermapm
 func GetTokenLoad(c *gin.Context) (*JWTLoad, map[string]interface{}) {
@@ -208,17 +172,17 @@ func SetField(obj interface{}, name string, value interface{}) error {
 	fmt.Println(structFieldValue)
 
 	if !structFieldValue.IsValid() {
-		return fmt.Errorf("No such field: %s in obj", name)
+		return fmt.Errorf("no such field: %s in obj", name)
 	}
 
 	if !structFieldValue.CanSet() {
-		return fmt.Errorf("Cannot set %s field value", name)
+		return fmt.Errorf("cannot set %s field value", name)
 	}
 
 	structFieldType := structFieldValue.Type()
 	val := reflect.ValueOf(value)
 	if structFieldType != val.Type() {
-		return errors.New("Provided value type didn't match obj field type")
+		return errors.New("provided value type didn't match obj field type")
 	}
 
 	structFieldValue.Set(val)

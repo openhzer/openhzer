@@ -18,13 +18,18 @@ func JWTCheck(c *gin.Context, model jwtpkg.LoadModel, issure ...string) (bool, e
 		return false, nil
 	}
 	token = token[7:]
-	chk, jwter, Claims, err := jwtpkg.CheckToken(token, model, "")
+	chk, jwter, err := jwtpkg.CheckToken(token, model, "")
 	if err != nil {
 		return false, err
 	}
 	chs := true
 	for _, v := range issure {
-		if v != Claims.Issuer {
+		jwt, err := jwter.GetIssuer()
+		if err != nil {
+			chs = false
+			break
+		}
+		if v != jwt {
 			chs = false
 			break
 		}
@@ -56,7 +61,7 @@ func JWTAuth(model jwtpkg.LoadModel, issure ...string) gin.HandlerFunc {
 			return
 		}
 		token = token[7:]
-		chk, jwter, Claims, err := jwtpkg.CheckToken(token, model, "")
+		chk, jwter, err := jwtpkg.CheckToken(token, model, "")
 		if err != nil {
 			errmsg := response.TokenWrongful
 			errmsg.Msg = "令牌验证错误"
@@ -70,8 +75,14 @@ func JWTAuth(model jwtpkg.LoadModel, issure ...string) gin.HandlerFunc {
 			return
 		}
 		chs := true
+		issuerStr := ""
 		for _, v := range issure {
-			if v != Claims.Issuer {
+			issuerStr, err = jwter.GetIssuer()
+			if err != nil {
+				chs = false
+				break
+			}
+			if v != issuerStr {
 				chs = false
 				break
 			}
@@ -85,7 +96,7 @@ func JWTAuth(model jwtpkg.LoadModel, issure ...string) gin.HandlerFunc {
 		}
 		c.Set("token", jwter)
 		c.Set("tokenStr", token)
-		c.Set("token.issuer", Claims.Issuer)
+		c.Set("token.issuer", issuerStr)
 		c.Next()
 	}
 }

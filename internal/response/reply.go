@@ -34,7 +34,7 @@ func SuccessJson(c *gin.Context, msg string, data ...interface{}) {
 }
 
 func FailJson(c *gin.Context, load FailStruct, WriteLog bool, logMsh ...string) {
-	id := util.GetUUID()
+	id, _ := util.GetUUID()
 	if WriteLog {
 		var werrmsg string
 		for _, v := range logMsh {
