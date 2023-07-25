@@ -11,11 +11,12 @@ import (
 	"time"
 )
 
-const ExpiresAtFiveDays = 3600 * 24 * 5
-
 var SecretKey = initKey()
 
 func initKey() string {
+	if SecretKey != "" {
+		return SecretKey
+	}
 	sk := os.Getenv("HZER_JWT_SECRET_KEY")
 	//每次启动都是随机秘钥
 	return util.Ifs(sk == "", util.RandomStr(32), sk)
