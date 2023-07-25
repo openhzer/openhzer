@@ -6,6 +6,7 @@ import (
 	"gopkg.in/yaml.v2"
 	"hzer/pkg/integral"
 	"hzer/pkg/jwt"
+	"hzer/pkg/util"
 	"io"
 	"io/ioutil"
 	"os"
@@ -65,6 +66,9 @@ func InitConfigs() {
 		panic(err)
 	}
 	if Data.App.SecretKey != "" {
+		os.Setenv("HZER_JWT_SECRET_KEY", Data.App.SecretKey)
 		jwt.SecretKey = Data.App.SecretKey
+	} else {
+		jwt.SecretKey = util.Ifs(jwt.SecretKey == "", util.RandomStr(32), jwt.SecretKey)
 	}
 }

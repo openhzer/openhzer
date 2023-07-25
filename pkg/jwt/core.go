@@ -5,22 +5,11 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
-	"hzer/pkg/util"
-	"os"
 	"reflect"
 	"time"
 )
 
-var SecretKey = initKey()
-
-func initKey() string {
-	if SecretKey != "" {
-		return SecretKey
-	}
-	sk := os.Getenv("HZER_JWT_SECRET_KEY")
-	//每次启动都是随机秘钥
-	return util.Ifs(sk == "", util.RandomStr(32), sk)
-}
+var SecretKey string
 
 // LoadModel 成员中套上jwt.RegisteredClaims
 type LoadModel interface {
