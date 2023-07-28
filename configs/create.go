@@ -8,7 +8,6 @@ import (
 	"hzer/pkg/jwt"
 	"hzer/pkg/util"
 	"io"
-	"io/ioutil"
 	"os"
 	"strings"
 )
@@ -46,8 +45,15 @@ func InitConfigs() {
 			switch strings.ToLower(ifs) {
 			case "n":
 				break
+			case "y":
+				err = os.WriteFile(Env+"_config.yml", configTemplate, 0644)
+				if err != nil {
+					fmt.Printf("配置文件生成失败, Error: %s", err.Error())
+					os.Exit(2)
+				}
+				fmt.Println("配置文件已生成,请修改配置文件后重新运行")
+				break
 			default:
-				ioutil.WriteFile(Env+"_config.yml", configTemplate, 0644)
 				fmt.Println("配置文件已生成,请修改配置文件后重新运行")
 				break
 			}
