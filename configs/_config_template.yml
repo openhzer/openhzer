@@ -21,6 +21,7 @@ Database:
     Charset: "utf8mb4"
     RedisCache: true #使用redis作为mysql的缓存驱动
   Redis:
+    Enable: false
     Host: ""
     Port: 6379
     Password: ""

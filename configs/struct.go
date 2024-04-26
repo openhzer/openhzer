@@ -30,6 +30,7 @@ type Database struct {
 }
 
 type Redis struct {
+	Enable   bool   `yaml:"Enable"`
 	Host     string `yaml:"Host"`
 	Port     int    `yaml:"Port"`
 	Password string `yaml:"Password"`

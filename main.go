@@ -88,6 +88,11 @@ func InitFunc() {
 		"\t╚═╝  ╚═╝╚══════╝╚══════╝╚═╝  ╚═╝\n")
 
 	//初始化数据库
-	redis.InitRedis(configs.Data.Database.Redis)
-	mysql.InitGorm(configs.Data.Database)
+	if configs.Data.Database.Redis.Enable {
+		redis.InitRedis(configs.Data.Database.Redis)
+	}
+	if configs.Data.Database.Mysql.Enable {
+		mysql.InitGorm(configs.Data.Database)
+	}
+
 }

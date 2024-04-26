@@ -39,7 +39,7 @@ func InitGorm(config configs.Database) {
 	//最大tcp连接数
 	sqlDB.SetMaxOpenConns(300)
 
-	if config.Mysql.RedisCache {
+	if config.Mysql.RedisCache && config.Redis.Enable {
 		//添加缓存中间件
 		opt := option.DefaultOption{}
 		opt.Expires = 300              //缓存时间, 默认120秒。范围30-43200
