@@ -9,8 +9,8 @@ require (
 	github.com/gin-gonic/gin v1.9.1
 	github.com/go-sql-driver/mysql v1.7.1
 	github.com/gofrs/uuid v4.4.0+incompatible
-	github.com/golang-jwt/jwt/v5 v5.0.0
-	github.com/gomodule/redigo v1.8.9
+	github.com/golang-jwt/jwt/v5 v5.2.1
+	github.com/gomodule/redigo v1.9.2
 	github.com/gorilla/websocket v1.5.0
 	github.com/jinzhu/gorm v1.9.16
 	github.com/mojocn/base64Captcha v1.3.6
@@ -38,7 +38,7 @@ require (
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-playground/validator/v10 v10.14.1 // indirect
-	github.com/go-redis/redis v6.15.6+incompatible // indirect
+	github.com/go-redis/redis v6.15.9+incompatible // indirect
 	github.com/go-redis/redis/v8 v8.11.5 // indirect
 	github.com/goccy/go-json v0.10.2 // indirect
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
@@ -55,12 +55,12 @@ require (
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.11 // indirect
 	golang.org/x/arch v0.4.0 // indirect
-	golang.org/x/crypto v0.21.0 // indirect
+	golang.org/x/crypto v0.31.0 // indirect
 	golang.org/x/image v0.13.0 // indirect
-	golang.org/x/net v0.21.0 // indirect
-	golang.org/x/sys v0.18.0 // indirect
-	golang.org/x/text v0.14.0 // indirect
-	golang.org/x/tools v0.7.0 // indirect
+	golang.org/x/net v0.33.0 // indirect
+	golang.org/x/sys v0.28.0 // indirect
+	golang.org/x/text v0.21.0 // indirect
+	golang.org/x/tools v0.21.1-0.20240508182429-e35e4ccd0d2d // indirect
 	google.golang.org/protobuf v1.33.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
