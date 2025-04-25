@@ -8,7 +8,7 @@ import (
 	"hzer/pkg/logger"
 )
 
-//configJsonBody json request body.
+// configJsonBody json request body.
 type configJsonBody struct {
 	Id            string
 	CaptchaType   string
@@ -22,7 +22,7 @@ type configJsonBody struct {
 
 var store = base64Captcha.DefaultMemStore
 
-//getCaptcha
+// getCaptcha
 // @Summary 获取验证码
 // @Description 用于预防人机的验证码
 // @Accept json
@@ -113,7 +113,10 @@ func getCaptcha(c *gin.Context) {
 		driver = param.DriverDigit
 	}
 	ca := base64Captcha.NewCaptcha(driver, store)
-	id, b64s, err := ca.Generate()
+	// id, b64s, answer, err := ca.Generate()
+	id, b64s, _, err := ca.Generate()
+	// answer
+
 	if err != nil {
 		response.FailJson(c, response.CaptchaError, false)
 		logger.Error(err)

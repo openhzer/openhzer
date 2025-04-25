@@ -7,6 +7,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
 	"hzer/configs"
+	"hzer/internal/mysql/dbaccess"
 )
 
 var (
@@ -31,9 +32,9 @@ func InitGorm(config configs.Database) {
 		panic(err)
 	}
 	sqlDB := mysqlDB.DB()
-	if err != nil {
-		panic(err)
-	}
+	//if err != nil {
+	//	panic(err)
+	//}
 	//始终保持的tcp连接数，即使连接都关闭了
 	sqlDB.SetMaxIdleConns(30)
 	//最大tcp连接数
@@ -54,12 +55,12 @@ func InitGorm(config configs.Database) {
 			Password: config.Redis.Password,
 		})
 	}
-
+	dbaccess.SetGlobalDB(mysqlDB)
 	InitTable()
 }
 
 func InitTable() {
 	//TODO: 添加数据表后在此注册
-	//mysqlDB.AutoMigrate(&HzerAdmin{})
+	mysqlDB.AutoMigrate(&dbaccess.User{})
 
 }
