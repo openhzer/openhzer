@@ -1,4 +1,4 @@
-/.idea
+.idea
 go.sum
 configs/*_config.yml
 bin/*

@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"hzer/internal/response"
 	jwtpkg "hzer/pkg/jwt"
+	"strings"
 )
 
 // JWTCheck 检查是否登陆
@@ -61,7 +62,7 @@ func JWTAuth(model jwtpkg.LoadModel, issure ...string) gin.HandlerFunc {
 			return
 		}
 		token = token[7:]
-		chk, jwter, err := jwtpkg.CheckToken(token, model, "")
+		chk, jwter, err := jwtpkg.CheckToken(token, model, strings.Join(issure, ""))
 		if err != nil {
 			errmsg := response.TokenWrongful
 			errmsg.Msg = "令牌验证错误"

@@ -3,7 +3,7 @@ package redis
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/garyburd/redigo/redis"
+	"github.com/gomodule/redigo/redis"
 	"github.com/silenceper/wechat/v2/miniprogram/auth"
 	"hzer/pkg/util"
 	"time"

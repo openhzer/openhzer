@@ -1,6 +1,6 @@
 package dbaccess
 
-import "github.com/jinzhu/gorm"
+import "gorm.io/gorm"
 
 var globalDB *gorm.DB
 
