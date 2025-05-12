@@ -8,6 +8,7 @@ import (
 	"hzer/internal/mysql"
 	"hzer/internal/redis"
 	"hzer/internal/router"
+	"hzer/pkg/util/TAAG"
 
 	"github.com/gin-gonic/gin"
 )
@@ -79,13 +80,10 @@ func main() {
 }
 
 func InitFunc() {
-	fmt.Printf("" +
-		"\t██╗  ██╗███████╗███████╗██████╗ \n" +
-		"\t██║  ██║╚══███╔╝██╔════╝██╔══██╗\n" +
-		"\t███████║  ███╔╝ █████╗  ██████╔╝\n" +
-		"\t██╔══██║ ███╔╝  ██╔══╝  ██╔══██╗\n" +
-		"\t██║  ██║███████╗███████╗██║  ██║\n" +
-		"\t╚═╝  ╚═╝╚══════╝╚══════╝╚═╝  ╚═╝\n")
+	taag, err := TAAG.ParseFLFFromBytes(TAAG.TemplateAnsiShadowFont)
+	if err == nil {
+		fmt.Printf(taag.Render("HZER"))
+	}
 
 	//初始化数据库
 	if configs.Data.Database.Redis.Enable {
